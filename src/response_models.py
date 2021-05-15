@@ -21,8 +21,8 @@ class Admin(BaseModel):
     id: int
     login: str
     name: str
-    primary_phone: int
-    phones: List[Phone]
+    # primary_phone: int
+    # phones: List[Phone]
 
 
 class Admins(BaseModel):

@@ -40,10 +40,10 @@ class Admin(Base):
     name = Column(String, nullable=True)
     pwd_hash = Column(String, nullable=False)
 
-    primary_phone_id = Column(Integer, ForeignKey('admin_phones.phone_id'))
-    primary_phone = relationship('Phone', back_populates="admins_primary")
+    # primary_phone_id = Column(Integer, ForeignKey('admin_phones.phone_id'))
+    # primary_phone = relationship('Phone', back_populates="admins_primary")
 
-    phones = relationship("Phone", secondary=admin_phones)
+    phones = relationship("Phone", secondary=admin_phones, )
 
 
 class Operator(Base):
@@ -53,8 +53,8 @@ class Operator(Base):
     name = Column(String, nullable=True)
     pwd_hash = Column(String, nullable=False)
 
-    primary_phone_id = Column(Integer, ForeignKey('operator_phones.phone_id'))
-    primary_phone = relationship('Phone', back_populates="operators_primary")
+    # primary_phone_id = Column(Integer, ForeignKey('operator_phones.phone_id'))
+    # primary_phone = relationship('Phone', back_populates="operators_primary")
 
     phones = relationship("Phone", secondary=operator_phones)
 
@@ -65,10 +65,9 @@ class Worker(Base):
     login = Column(String, nullable=False)
     name = Column(String, nullable=True)
     pwd_hash = Column(String, nullable=False)
-    orders = relationship('Order')
 
-    primary_phone_id = Column(Integer, ForeignKey('worker_phones.phone_id'))
-    primary_phone = relationship('Phone', back_populates="workers_primary")
+    # primary_phone_id = Column(Integer, ForeignKey('worker_phones.phone_id'))
+    # primary_phone = relationship('Phone', back_populates="workers_primary")
     phones = relationship("Phone", secondary=worker_phones)
 
     appliances_brands = relationship('AppliancesBrand', secondary=worker_brands)
@@ -79,11 +78,10 @@ class Customer(Base):
     __tablename__ = 'customers'
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=True)
-    orders = relationship('Order')
 
-    primary_phone_id = Column(Integer, ForeignKey('customer_phones.phone_id'))
+    # primary_phone_id = Column(Integer, ForeignKey('customer_phones.phone_id'))
+    # primary_phone = relationship('Phone', back_populates="customers_primary")
 
-    primary_phone = relationship('Phone', back_populates="customers_primary")
     phones = relationship("Phone", secondary=customer_phones)
     addresses = relationship("Address", secondary=customer_addresses)
 
@@ -97,10 +95,11 @@ class Order(Base):
     appliances_id = Column(Integer, ForeignKey('appliances.id'), nullable=False)
     address_id = Column(Integer, ForeignKey('addresses.id'), nullable=False)
 
-    appliances = relationship('Appliances', back_populates='orders')
-    worker = relationship('Worker', back_populates='orders')
-    customer = relationship('Customer', back_populates='orders')
-    address = relationship('Address', back_populates='orders')
+    appliances = relationship('Appliances')
+    worker = relationship('Worker')
+    customer = relationship('Customer')
+    address = relationship('Address')
+
     status = Column(String, nullable=False)
 
 
@@ -128,10 +127,11 @@ class Appliances(Base):
     appliances_name = Column(String, unique=True)
 
     brand_id = Column(Integer, ForeignKey('appliances_brand.id'))
-    brand = relationship('AppliancesBrand', back_populates="appliances")
+    brand = relationship('AppliancesBrand')
 
     type_id = Column(Integer, ForeignKey('appliances_type.id'))
-    appliances_type = relationship('AppliancesType', back_populates="appliances")
+    appliances_type = relationship('AppliancesType')
+
 
 
 class Address(Base):

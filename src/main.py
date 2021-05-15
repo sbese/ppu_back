@@ -1,11 +1,12 @@
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
+from pydantic_sqlalchemy import sqlalchemy_to_pydantic
 
 from .database import get_db
 
 from . import response_models
 from . import schemas
-
+from . import models
 app = FastAPI()
 
 
@@ -16,12 +17,27 @@ def admin_login(login_data: schemas.LoginSchema, db: Session = Depends(get_db)):
 
 @app.put('/admin/', response_model=response_models.BaseResponse, tags=['Администратор'])
 def create_admin(new_admin: schemas.CreateAdmin, db: Session = Depends(get_db)):
-    pass
+    admin = models.Admin(
+        login=new_admin.login,
+        name=new_admin.name,
+        pwd_hash=new_admin.pwd_hash,
+    )
+    db.add(admin)
+    db.commit()
+    return response_models.BaseResponse()
 
-
-@app.get('/admins', response_model=response_models.Admins, tags=['Администратор'])
+# , response_model=response_models.Admins
+@app.get('/admins', tags=['Администратор'], response_model=response_models.Admins)
 def get_admins(db: Session = Depends(get_db)):
-    pass
+    admins = db.query(models.Admin).all()
+    return response_models.Admins(items=[
+        response_models.Admin(
+            id = x.id,
+            name = x.name,
+            login = x.login
+        ) for x in admins
+    ])
+
 
 
 @app.get('/admin/{admin_id}', response_model=response_models.Admin, tags=['Администратор'])
@@ -70,27 +86,27 @@ def get_operator(operator_id: int, db: Session = Depends(get_db)):
 
 
 @app.patch('/operator/{operator_id}/primary_phone', response_model=response_models.BaseResponse, tags=['Оператор'])
-def change_admin_primary_phone(operator_id: int, new_phone: schemas.NewPhone, db: Session = Depends(get_db)):
+def change_operator_primary_phone(operator_id: int, new_phone: schemas.NewPhone, db: Session = Depends(get_db)):
     pass
 
 
 @app.patch('/operator/{operator_id}/phone', response_model=response_models.BaseResponse, tags=['Оператор'])
-def add_admin_phone(operator_id: int, new_phone: schemas.NewPhone, db: Session = Depends(get_db)):
+def add_operator_phone(operator_id: int, new_phone: schemas.NewPhone, db: Session = Depends(get_db)):
     pass
 
 
 @app.patch('/operator/{operator_id}/name', response_model=response_models.BaseResponse, tags=['Оператор'])
-def change_admin_name(operator_id: int, new_name: schemas.NewName, db: Session = Depends(get_db)):
+def change_operator_name(operator_id: int, new_name: schemas.NewName, db: Session = Depends(get_db)):
     pass
 
 
 @app.patch('/operator/{operator_id}/password', response_model=response_models.BaseResponse, tags=['Оператор'])
-def change_admin_name(operator_id: int, new_password: schemas.NewPassword, db: Session = Depends(get_db)):
+def change_operator_password(operator_id: int, new_password: schemas.NewPassword, db: Session = Depends(get_db)):
     pass
 
 
 @app.delete('/operator/{operator_id}/phone', response_model=response_models.BaseResponse, tags=['Оператор'])
-def remove_admin_phone(operator_id: int, new_phone: schemas.NewPhone, db: Session = Depends(get_db)):
+def remove_operator_phone(operator_id: int, new_phone: schemas.NewPhone, db: Session = Depends(get_db)):
     pass
 
 
@@ -115,22 +131,22 @@ def change_admin_primary_phone(worker_id: int, new_phone: schemas.NewPhone, db: 
 
 
 @app.patch('/worker/{worker_id}/phone', response_model=response_models.BaseResponse, tags=['Исполнитель'])
-def add_admin_phone(worker_id: int, new_phone: schemas.NewPhone, db: Session = Depends(get_db)):
+def add_worker_phone(worker_id: int, new_phone: schemas.NewPhone, db: Session = Depends(get_db)):
     pass
 
 
 @app.patch('/worker/{worker_id}/name', response_model=response_models.BaseResponse, tags=['Исполнитель'])
-def change_admin_name(worker_id: int, new_name: schemas.NewName, db: Session = Depends(get_db)):
+def change_worker_name(worker_id: int, new_name: schemas.NewName, db: Session = Depends(get_db)):
     pass
 
 
 @app.patch('/worker/{worker_id}/password', response_model=response_models.BaseResponse, tags=['Исполнитель'])
-def change_admin_name(worker_id: int, new_password: schemas.NewPassword, db: Session = Depends(get_db)):
+def change_worker_name(worker_id: int, new_password: schemas.NewPassword, db: Session = Depends(get_db)):
     pass
 
 
 @app.delete('/worker/{worker_id}/phone', response_model=response_models.BaseResponse, tags=['Исполнитель'])
-def remove_admin_phone(worker_id: int, new_phone: schemas.NewPhone, db: Session = Depends(get_db)):
+def remove_worker_phone(worker_id: int, new_phone: schemas.NewPhone, db: Session = Depends(get_db)):
     pass
 
 
@@ -180,17 +196,17 @@ def get_workers(customer_id: int, db: Session = Depends(get_db)):
 
 
 @app.patch('/customer/{customer_id}/primary_phone', response_model=response_models.BaseResponse, tags=['Клиент'])
-def change_admin_primary_phone(customer_id: int, new_phone: schemas.NewPhone, db: Session = Depends(get_db)):
+def change_customer_primary_phone(customer_id: int, new_phone: schemas.NewPhone, db: Session = Depends(get_db)):
     pass
 
 
 @app.patch('/customer/{customer_id}/phone', response_model=response_models.BaseResponse, tags=['Клиент'])
-def add_admin_phone(customer_id: int, new_phone: schemas.NewPhone, db: Session = Depends(get_db)):
+def add_customer_phone(customer_id: int, new_phone: schemas.NewPhone, db: Session = Depends(get_db)):
     pass
 
 
 @app.patch('/customer/{customer_id}/name', response_model=response_models.BaseResponse, tags=['Клиент'])
-def change_admin_name(customer_id: int, new_name: schemas.NewName, db: Session = Depends(get_db)):
+def change_customer_name(customer_id: int, new_name: schemas.NewName, db: Session = Depends(get_db)):
     pass
 
 
